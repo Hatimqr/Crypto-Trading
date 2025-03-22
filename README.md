@@ -4,7 +4,7 @@ The cryptocurrency market, particularly Bitcoin, presents unique challenges for 
 
 # Research Question
 
-How can we develop a robust daily decision-making framework for Bitcoin trading that effectively determines optimal actions (buy, sell, or hold) and their magnitude to maximize returns while managing risk across different market conditions? 
+How can we develop a robust daily decision-making framework for Bitcoin trading that effectively determines optimal actions (buy, sell, or hold) and their magnitude to maximize returns while managing risk across different market conditions?
 
 Starting with an initial budget $B_0$, an investor makes a sequence of daily trading decisions over a period of $T$ days, denoted as $D = \{d_1, d_2, ..., d_T\}$. For each day $t$, the decision $d_t \in \mathbb{R}$ represents the amount of Bitcoin to trade, where:
 
@@ -15,7 +15,7 @@ Starting with an initial budget $B_0$, an investor makes a sequence of daily tra
 Given the daily Bitcoin prices $P = \{p_1, p_2, ..., p_T\}$, the investor's portfolio value $V_t$ after day $t$ can be expressed as:
 
 $$
-V_t=B_t+Q_t\cdot p_t 
+V_t=B_t+Q_t\cdot p_t
 $$
 
 Where $B_t$ is the remaining cash budget and $Q_t$ is the quantity of Bitcoin held after day $t$. These values are updated according to each decision:
@@ -26,7 +26,7 @@ B_t = B_{t-1} - d_t \cdot p_t - c(d_t, p_t)
 Q_t = Q_{t-1} + d_t
 $$
 
-With $c(d_t, p_t)$ representing transaction costs associated with the trade. 
+With $c(d_t, p_t)$ representing transaction costs associated with the trade.
 
 The objective is to find the optimal decision sequence $D^*$ that maximizes the final Sharpe Ratio while maintaining acceptable drawdown levels. Here, each decision where each decision implicitly relies on forecasting future Bitcoin price movements based on available market information up to day $t-1$. Note, at any given time there may be excess cash that the algorithm has decided not to invest into bitcoin. Return on this excess cash will be based on that day’s risk free rate, which would provide a lower bound on average return from alternate investments that are independent of bitcoin.
 
@@ -41,7 +41,6 @@ The analysis will utilize a dataset of daily financial indicators from 2015 to p
 - **Oil Prices**: Tracked using the United States Oil Fund (USO), also obtained from Yahoo Finance, with price and volume metrics
 - **Risk-Free Rate**: 3-month Treasury yield (^IRX) sourced from Yahoo Finance as a proxy for the risk-free interest rate
 - **Equity Market**: S&P 500 Index (^GSPC) data from Yahoo Finance, including both price and trading volume to represent broader market movements and liquidity
-- **Cryptocurrency Ecosystem**: Bitwise 10 Crypto Index Fund (BITW) data from Yahoo Finance, with both price and volume data to provide context within the wider cryptocurrency market
 - **Transaction costs:** Transaction costs are dynamic and based on multiple factors like volume, spread, market conditions, etc. I will try to approximate this using [binance’s fee schedule](https://www.binance.com/en/fee/schedule) which is based on 30 day trading volume.
 
 ## Collection
@@ -70,15 +69,15 @@ The dataset will be split chronologically into training (70%), validation (15%),
 
 ### Summary Statistics
 
-|  | btc_close | btc_volume | gld_price | gld_volume | uso_price | uso_volume | sp500_price | sp500_volume |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| mean | 22819.45 | 14398.3 | 154.89 | 8646902.16 | 76.76 | 4424337.86 | 3482.33 | 4068799926.26 |
-| std | 24479.6 | 11759.82 | 38.01 | 4583017.3 | 23.17 | 4418623.75 | 1118.29 | 1076005442.73 |
-| min | 211.16 | 683.8 | 100.5 | 1436500.0 | 17.04 | 431738.0 | 1829.08 | 1296530000.0 |
-| 25% | 4004.59 | 6739.0 | 121.37 | 5718725.0 | 66.96 | 2505575.0 | 2581.02 | 3434400000.0 |
-| 50% | 10789.38 | 11355.56 | 156.28 | 7550900.0 | 77.94 | 3551969.0 | 3222.33 | 3841910000.0 |
-| 75% | 37266.84 | 18243.23 | 177.68 | 10378075.0 | 91.68 | 4999425.0 | 4327.62 | 4431900000.0 |
-| max | 106159.26 | 165542.81 | 275.13 | 49139000.0 | 135.28 | 124913013.0 | 6144.15 | 9976520000.0 |
+|      | btc_close | btc_volume | gld_price | gld_volume | uso_price | uso_volume  | sp500_price | sp500_volume  |
+| ---- | --------- | ---------- | --------- | ---------- | --------- | ----------- | ----------- | ------------- |
+| mean | 22819.45  | 14398.3    | 154.89    | 8646902.16 | 76.76     | 4424337.86  | 3482.33     | 4068799926.26 |
+| std  | 24479.6   | 11759.82   | 38.01     | 4583017.3  | 23.17     | 4418623.75  | 1118.29     | 1076005442.73 |
+| min  | 211.16    | 683.8      | 100.5     | 1436500.0  | 17.04     | 431738.0    | 1829.08     | 1296530000.0  |
+| 25%  | 4004.59   | 6739.0     | 121.37    | 5718725.0  | 66.96     | 2505575.0   | 2581.02     | 3434400000.0  |
+| 50%  | 10789.38  | 11355.56   | 156.28    | 7550900.0  | 77.94     | 3551969.0   | 3222.33     | 3841910000.0  |
+| 75%  | 37266.84  | 18243.23   | 177.68    | 10378075.0 | 91.68     | 4999425.0   | 4327.62     | 4431900000.0  |
+| max  | 106159.26 | 165542.81  | 275.13    | 49139000.0 | 135.28    | 124913013.0 | 6144.15     | 9976520000.0  |
 
 # Timeline
 
@@ -132,7 +131,7 @@ where:
 3. Portfolio value at each step: $V_t = B_t + Q_t × p_t$
 4. Calculate periodic returns: $r_t = \frac{V_t - V_{t-1}}{V_{t-1}}$
 5. $R_p=\left(1+\frac{\sum_{t=1}^nr_t}{n}\right)^{365}-1$
-6. $σ_p​= \sqrt{\frac{\sum_{t=1}^n(r_t-\bar{r})^2}{n-1}} \cdot \sqrt{365​}$
+6. $σ_p= \sqrt{\frac{\sum_{t=1}^n(r_t-\bar{r})^2}{n-1}} \cdot \sqrt{365}$
 
 ### Maximum Drawdown
 
@@ -177,7 +176,7 @@ Examine individual trading decisions to evaluate their effectiveness through the
 - Average profit/loss per trade: Mean portfolio value change resulting from each non-zero $d_i$
 - Average holding period: Typical duration between buy and sell decisions
 
-This analysis helps identify whether our algorithm makes consistently good quantity decisions or relies on a few outsized winners. 
+This analysis helps identify whether our algorithm makes consistently good quantity decisions or relies on a few outsized winners.
 
 These metrics will be mainly used on the test set to understand what the model is really doing so I might find ways of improving it or making necessary changes.
 
