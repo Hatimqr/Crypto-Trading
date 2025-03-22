@@ -67,7 +67,7 @@ def get_bitcoin_data(start_date):
         'volume': 'btc_volume'
     })
     
-    return df
+    return df[['btc_close', 'btc_volume']]
 
 def get_yfinance_data(start_date, end_date=None):
     """
@@ -83,7 +83,10 @@ def get_yfinance_data(start_date, end_date=None):
     # USO - United States Oil Fund
     # ^IRX - 13-week (3-month) Treasury yield
     # ^GSPC - S&P 500 Index
-    tickers = ['GLD', 'USO', '^IRX', '^GSPC', 'BITW']
+    # BITW - bitcoin index
+
+    # tickers = ['GLD', 'USO', '^IRX', '^GSPC', 'BITW']
+    tickers = ['GLD', 'USO', '^IRX', '^GSPC']
     
     # Dictionary to store dataframes
     dfs = {}
@@ -144,8 +147,8 @@ def merge_data(btc_df, market_df):
 def main():
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Fetch financial data starting from a specific date')
-    parser.add_argument('start_date', type=str, help='Start date in YYYY-MM-DD format')
-    parser.add_argument('--output', type=str, default='financial_data.csv', 
+    parser.add_argument('start_date', type=str, default='2015-01-01', help='Start date in YYYY-MM-DD format')
+    parser.add_argument('--output', type=str, default='data/financial_data.csv', 
                       help='Output CSV filename (default: financial_data.csv)')
     
     # Parse arguments
