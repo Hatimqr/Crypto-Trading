@@ -1,6 +1,6 @@
 # Introduction
 
-The cryptocurrency market, particularly Bitcoin, presents unique challenges for forecasting due to its high volatility and sensitivity to various external factors. This project explores the application of Machine Learning and Stochastic Processes to formulate a trading strategy for bitcoin. Combining a computer science approach with economic forecasting principles, I aim to develop a framework that can effectively predict optimal trading actions (buy, sell, or hold) and their respective magnitudes (for buy and sell) based on historical market data and related financial indicators.
+The cryptocurrency market, particularly Bitcoin, presents unique challenges for forecasting due to its high volatility and difficulty to predict. This project explores multiple approaches to formulate a trading strategy for bitcoin. I aim to develop a framework that can effectively predict optimal trading actions (buy, sell, or hold) and their respective magnitudes (for buy and sell) based on historical market data.
 
 # Research Question
 
@@ -34,36 +34,7 @@ The objective is to find the optimal decision sequence $D^*$ that maximizes the 
 
 ## Data Description
 
-The analysis will utilize a dataset of daily financial indicators from 2015 to present, sourced through the [cctx](https://docs.ccxt.com/#/) and [yfinance](https://python-yahoofinance.readthedocs.io/en/latest/) python libraries:
-
-- **Bitcoin OHLCV Data**: Sourced directly from Coinbase cryptocurrency exchange via the CCXT library, providing daily Open, High, Low, Close prices and Volume information
-- **Gold Prices**: Represented by the SPDR Gold Shares ETF (GLD), obtained from Yahoo Finance, including both price and volume data
-- **Oil Prices**: Tracked using the United States Oil Fund (USO), also obtained from Yahoo Finance, with price and volume metrics
-- **Risk-Free Rate**: 3-month Treasury yield (^IRX) sourced from Yahoo Finance as a proxy for the risk-free interest rate
-- **Equity Market**: S&P 500 Index (^GSPC) data from Yahoo Finance, including both price and trading volume to represent broader market movements and liquidity
-- **Transaction costs:** Transaction costs are dynamic and based on multiple factors like volume, spread, market conditions, etc. I will try to approximate this using [binance’s fee schedule](https://www.binance.com/en/fee/schedule) which is based on 30 day trading volume.
-
-## Collection
-
-All data collection is automated by a python script, which handles API connections, synchronizes data from different sources, and implements appropriate cleaning procedures. The script performs several key functions:
-
-- Fetches Bitcoin data via CCXT with proper rate limiting
-- Collects complementary financial data through Yahoo Finance
-- Aligns data points to ensure temporal consistency
-- Handles missing values through forward-fill (mainly to fill in weekend prices for all variables not related to bitcoin)
-- Merges datasets into a unified dataframe and saves the resulting csv file.
-
-## Dependent and Independent Variables
-
-The primary dependent variable will be Bitcoin's daily close price, while independent variables will include:
-
-- Lagged values of Bitcoin prices
-- Volume metrics for Bitcoin and related assets (important for liquidity analysis)
-- Technical indicators derived from price and volume data (moving averages, relative strength index, Bollinger bands, volume oscillators)
-- Price and volume correlations between Bitcoin and traditional financial assets
-- Volatility measures derived from high-low ranges
-
-The dataset will be split chronologically into training (70%), validation (15%), and testing (15%) sets to properly evaluate the forecasting models without look-ahead bias. All price data will be normalized to facilitate model training.
+The analysis will utilize a dataset of historic bitcoin data from 2020 to present, sourced through the [cctx](https://docs.ccxt.com/#/) library.
 
 ## Key Metrics
 

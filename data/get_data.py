@@ -67,7 +67,7 @@ def get_bitcoin_data(start_date):
         'volume': 'btc_volume'
     })
     
-    return df[['btc_close', 'btc_volume']]
+    return df
 
 def get_yfinance_data(start_date, end_date=None):
     """
