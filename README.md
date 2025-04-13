@@ -42,15 +42,15 @@ The analysis will utilize a dataset of daily bitcoin data from 2015 to present, 
 
 ### Summary Statistics
 
-|      | btc_close | btc_volume | gld_price | gld_volume | uso_price | uso_volume  | sp500_price | sp500_volume  |
-| ---- | --------- | ---------- | --------- | ---------- | --------- | ----------- | ----------- | ------------- |
-| mean | 22819.45  | 14398.3    | 154.89    | 8646902.16 | 76.76     | 4424337.86  | 3482.33     | 4068799926.26 |
-| std  | 24479.6   | 11759.82   | 38.01     | 4583017.3  | 23.17     | 4418623.75  | 1118.29     | 1076005442.73 |
-| min  | 211.16    | 683.8      | 100.5     | 1436500.0  | 17.04     | 431738.0    | 1829.08     | 1296530000.0  |
-| 25%  | 4004.59   | 6739.0     | 121.37    | 5718725.0  | 66.96     | 2505575.0   | 2581.02     | 3434400000.0  |
-| 50%  | 10789.38  | 11355.56   | 156.28    | 7550900.0  | 77.94     | 3551969.0   | 3222.33     | 3841910000.0  |
-| 75%  | 37266.84  | 18243.23   | 177.68    | 10378075.0 | 91.68     | 4999425.0   | 4327.62     | 4431900000.0  |
-| max  | 106159.26 | 165542.81  | 275.13    | 49139000.0 | 135.28    | 124913013.0 | 6144.15     | 9976520000.0  |
+|      | btc_close | btc_volume |
+| ---- | --------- | ---------- |
+| mean | 22819.45  | 14398.3    |
+| std  | 24479.6   | 11759.82   |
+| min  | 211.16    | 683.8      |
+| 25%  | 4004.59   | 6739.0     |
+| 50%  | 10789.38  | 11355.56   |
+| 75%  | 37266.84  | 18243.23   |
+| max  | 106159.26 | 165542.81  |
 
 # Timeline
 
@@ -61,9 +61,56 @@ The analysis will utilize a dataset of daily bitcoin data from 2015 to present, 
 - Feature engineering to create technical indicators
 - Correlation analysis to identify relationships between Bitcoin and other assets
 
-## **Model Development**:
+## Model:  Fair value gap (FVG)
 
-The model is primarily based on Fair Value Gaps between the high and lows during the day.
+A Fair Value Gap (FVG) occurs when there is a significant gap between price candles that indicates a potential area where price may return to "fill" the gap. The strategy identifies and trades based on these market inefficiencies.
+
+### FVG Detection Logic
+
+The strategy identifies FVGs using the following criteria:
+
+1. Analyzes three consecutive candles (A, B, C)
+2. For Bullish FVG:
+
+- Candle C's high is below Candle A's low
+- Gap must be larger than average candle body size × multiplier
+
+3. For Bearish FVG:
+
+- Candle C's low is above Candle A's high
+- Gap must be larger than average candle body size × multiplier
+
+### Position Sizing
+
+Position sizes are dynamically calculated based on multiple factors:
+
+1.**Base Position**: Starts with 30% allocation
+
+2.**Volatility Adjustment**: Up to 30% additional based on 20-day rolling volatility
+
+3.**Momentum Component**: Up to 20% based on 20-day price momentum
+
+4.**Gap Size Impact**: Up to 20% based on FVG size
+
+5.**Consecutive Signals**: Position size increases with consecutive signals (20% per signal, max 100%)
+
+The final position size is capped at 100% of available capital and is further adjusted by:
+
+- Upside scaler for buy positions
+- Downside scaler for sell positions
+
+### Parameters
+
+-`lookback_period`: 20 days (for volatility calculation)
+
+-`body_multiplier`: 1.5 (minimum gap size relative to average candle body)
+
+-`back_candles`: 50 (historical candles to analyze)
+
+-`test_candles`: 10 (forward-looking period for signal validation)
+
+## Model: Machine Learning and Neural Networks
+
 
 # Evaluation
 
