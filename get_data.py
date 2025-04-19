@@ -2,8 +2,10 @@ import ccxt
 import pandas as pd
 import time
 from datetime import datetime, timezone
+import yfinance as yf
 
-def get_bitcoin_data(start_date, timeframe):
+
+def get_bitcoin_data(start_date, timeframe='1d'):
     """
     Fetch Bitcoin hourly OHLCV data from Coinbase using CCXT
     
@@ -67,14 +69,27 @@ def get_bitcoin_data(start_date, timeframe):
     
     return df
 
+def get_risk_free_rate(start_date):
+
+
+    # get todays date
+    today = datetime.now().strftime('%Y-%m-%d')
+
+    # get 15 week risk free rate
+    rf_data = yf.download('^TNX', start='2015-01-01', end=today)['Close'] / 100
+    rf_data.columns = ['Risk Free Rate']
+    return rf_data
+
 
 if __name__ == "__main__":
     start_date = '2015-01-01T00:00:00Z'  
     df = get_bitcoin_data(start_date, '1d')
-    print(df.head())
+    rf_data = get_risk_free_rate(start_date)
+    merged_df = df.merge(rf_data, left_index=True, right_index=True, how='left')
+    merged_df['Risk Free Rate'] = merged_df['Risk Free Rate'].ffill()
     # Save to CSV
 
     import os
-    path = os.path.join(os.path.dirname(__file__), 'btc_daily.csv')
-    df.to_csv(path)
-    print("Hourly Bitcoin data saved to btc_daily.csv")
+    path = os.path.join(os.path.dirname(__file__), 'data.csv')
+    merged_df.to_csv(path)
+    print("Bitcoin and risk free rate data saved to data.csv")
