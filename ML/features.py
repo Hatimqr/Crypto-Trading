@@ -17,13 +17,18 @@ class FeatureEngineer:
         """
         # Store the original dataframe
         self.original_df = df.copy()
+
+
         # Create features dataframe without signals
-        self.X = df.drop(columns=['Signals'], errors='ignore')
-        # Calculate returns if not already present
-        if 'Return' not in self.X.columns:
-            self.X['Return'] = self.X['Close'].pct_change()
+        self.X = df.drop(columns=['Signals'])
+        # Calculate returns
+        self.X['Return'] = self.X['Close'].pct_change()
+
+
         # Store target variable
         self.y = df['Signals'] if 'Signals' in df.columns else None
+
+
         # Keep track of added features
         self.feature_names = []
     
@@ -298,8 +303,8 @@ class FeatureEngineer:
         self.add_price_levels()
         
         # Only add lagged signals if we have target data
-        if self.y is not None:
-            self.add_lagged_signals()
+        # if self.y is not None:
+        #     self.add_lagged_signals()
         
         return self.X
     

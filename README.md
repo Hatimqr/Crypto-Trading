@@ -109,8 +109,7 @@ The final position size is capped at 100% of available capital and is further ad
 
 -`test_candles`: 10 (forward-looking period for signal validation)
 
-## Model: Machine Learning and Neural Networks
-
+## Model: Opt Strategy and Random Forest
 
 # Evaluation
 
