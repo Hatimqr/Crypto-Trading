@@ -10,7 +10,7 @@ class FVGStrategy:
     price levels, and generate trading signals with corresponding position sizes.
     """
     
-    def __init__(self, lookback_period=20, body_multiplier=1.5, backcandles=50, test_candles=10):
+    def __init__(self, lookback_period=20 , body_multiplier=1.5, backcandles=50, test_candles=10):
         """
         Initialize the FVG strategy with the specified parameters.
         
@@ -21,10 +21,10 @@ class FVGStrategy:
             test_candles (int): Number of candles before/after for key level validation.
             responsiveness (float in [0,1]) : how responsive are we going to be to buy/sell signals
         """
-        self.lookback_period = lookback_period
-        self.body_multiplier = body_multiplier
-        self.backcandles = backcandles
-        self.test_candles = test_candles
+        self.lookback_period = int(lookback_period)
+        self.body_multiplier = float(body_multiplier)
+        self.backcandles = int(backcandles)
+        self.test_candles = int(test_candles)
 
     def detect_fvg(self, data):
         """
