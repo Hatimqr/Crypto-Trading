@@ -254,6 +254,5 @@ class FVGStrategy:
         print("Signal Generation Complete")
 
         processed_df.rename(columns={'Unnamed: 0': 'Date', 'break_signal': 'Signal'}, inplace=True)
-        # processed_df.set_index('Date', inplace=True)
-        # return processed_df[['Close','break_signal', 'buy_pct', 'sell_pct']]
-        return processed_df[['Date', 'Close', 'Signal']]
+        processed_df['Date'] = pd.to_datetime(processed_df['Date'])
+        return processed_df[['Date', 'Close', 'Signal', 'Risk Free Rate']]
