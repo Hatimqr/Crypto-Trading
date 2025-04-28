@@ -10,7 +10,7 @@ class FVGStrategy:
     price levels, and generate trading signals with corresponding position sizes.
     """
     
-    def __init__(self, lookback_period=20, body_multiplier=1.5, backcandles=50, test_candles=10, upside_scaler=1, downside_scaler=1):
+    def __init__(self, lookback_period=20, body_multiplier=1.5, backcandles=50, test_candles=10):
         """
         Initialize the FVG strategy with the specified parameters.
         
@@ -25,8 +25,6 @@ class FVGStrategy:
         self.body_multiplier = body_multiplier
         self.backcandles = backcandles
         self.test_candles = test_candles
-        self.upside_scaler = upside_scaler
-        self.downside_scaler = downside_scaler
 
     def detect_fvg(self, data):
         """
@@ -177,7 +175,7 @@ class FVGStrategy:
                     for (lvl_idx, lvl_price) in resistance_levels:
                         # Condition: previously below, ended above
                         if prev_open < lvl_price and prev_close > lvl_price:
-                            df.loc[i, "break_signal"] = 2  # Buy signal
+                            df.loc[i, "break_signal"] = 1  # Buy signal
                             break  # No need to check more levels
 
                 # Bearish FVG check
@@ -188,102 +186,28 @@ class FVGStrategy:
                     for (lvl_idx, lvl_price) in support_levels:
                         # Condition: previously above, ended below
                         if prev_open > lvl_price and prev_close < lvl_price:
-                            df.loc[i, "break_signal"] = 1  # Sell signal
+                            df.loc[i, "break_signal"] = -1  # Sell signal
                             break  # No need to check more levels
 
         return df
     
 
     
-    def calculate_position_percentages(self, df):
-        # Initialize columns with zeros
-        df['buy_pct'] = 0.0
-        df['sell_pct'] = 0.0
-        
-        df['returns'] = df['Close'].pct_change()
-        # Part 1 - volatility (avoid look-ahead bias)
-        rolling_volatility = df['returns'].pct_change().rolling(20).std()
-        # Normalize volatility using expanding mean to avoid look-ahead bias
-        expanding_vol_mean = rolling_volatility.expanding().mean()
-        normalized_volatility = rolling_volatility / expanding_vol_mean
-        # Clip to reasonable range
-        normalized_volatility = normalized_volatility.clip(0.5, 2.0)
-        
-        # Part 2 - momentum multiplier 
-        momentum_20 = df['Close'].pct_change(20)
-        # Normalize momentum to 0-1 range
-        normalized_momentum = (momentum_20 + 0.2).clip(0, 0.4) / 0.4  # Assuming ±20% as typical range
-        
-        # Part 3 - FVG gap percentage
-        df['fvg_gap'] = 0.0
-        for i in df.index:
-            if isinstance(df.loc[i, 'FVG'], tuple):
-                fvg_type, start, end, idx = df.loc[i, 'FVG']
-                df.loc[i, 'fvg_gap'] = abs(end - start) / start
-        
-        # Normalize FVG gap to 0-1 range (assuming 10% is a very large gap)
-        df['normalized_gap'] = (df['fvg_gap'] * 10).clip(0, 1)
-        
-        # Part 4 - consecutive candles and combine signals
-        consecutive_buys = 0
-        consecutive_sells = 0
-        prev_signal = 0
-        
-        for i in tqdm(df.index,
-                      desc="Calculating Position Percentages"):
-            signal = df.loc[i, 'break_signal']
-            
-            # Update consecutive signal counters
-            if signal == 2:  # Buy signal
-                if prev_signal == 2:
-                    consecutive_buys += 1
-                    consecutive_sells = 0
-                else:
-                    consecutive_buys = 1
-                    consecutive_sells = 0
-                    
-                # Calculate normalized consecutive signal factor (0.2 per signal, max 1.0)
-                consec_factor = min(consecutive_buys * 0.2, 1.0)
-                
-                # Combine factors with appropriate weights
-                # Base 0.3 + up to 0.3 from volatility + up to 0.2 from momentum + up to 0.2 from gap
-                position_size = 0.3 + (normalized_volatility.loc[i] * 0.3) + \
-                            (normalized_momentum.loc[i] * 0.2) + \
-                            (df.loc[i, 'normalized_gap'] * 0.2)
-                
-                # Apply consecutive signal boost
-                position_size = position_size * (1 + consec_factor)
-                
-                # Scale and cap at 1.0 (100%)
-                df.loc[i, 'buy_pct'] = min(position_size * self.upside_scaler, 1.0)
-                
-            elif signal == 1:  # Sell signal
-                if prev_signal == 1:
-                    consecutive_sells += 1
-                    consecutive_buys = 0
-                else:
-                    consecutive_sells = 1
-                    consecutive_buys = 0
-                    
-                # Calculate normalized consecutive signal factor (0.2 per signal, max 1.0)
-                consec_factor = min(consecutive_sells * 0.2, 1.0)
-                
-                # Combine factors with appropriate weights
-                # Base 0.3 + up to 0.3 from volatility + up to 0.2 from momentum + up to 0.2 from gap
-                position_size = 0.3 + (normalized_volatility.loc[i] * 0.3) + \
-                            (normalized_momentum.loc[i] * 0.2) + \
-                            (df.loc[i, 'normalized_gap'] * 0.2)
-                
-                # Apply consecutive signal boost
-                position_size = position_size * (1 + consec_factor)
-                
-                # Scale and cap at 1.0 (100%)
-                df.loc[i, 'sell_pct'] = min(position_size * self.downside_scaler, 1.0)
-            
-            prev_signal = signal
-        
-        # Clean up temporary columns
-        df = df.drop(['fvg_gap', 'normalized_gap', 'returns'], axis=1)
+    def calculate_position(self, df):
+        # df has signal column
+
+        df["position"] = 1
+        for i in range(len(df)):
+            if df.loc[i, "break_signal"] == 1:
+                df.loc[i, "position"] = 1
+            elif df.loc[i, "break_signal"] == -1:
+                df.loc[i, "position"] = 0
+            else:
+                try:
+                    df.loc[i, "position"] = df.loc[i-1, "position"]
+                except:
+                    pass # on day 0, we have no previous day, so we assume we are long (initialised everything to 1)
+
         
         return df
 
@@ -324,12 +248,12 @@ class FVGStrategy:
         
         processed_df = self.detect_break_signal(processed_df)
         
-        processed_df = self.calculate_position_percentages(processed_df)
+        # processed_df = self.calculate_position(processed_df)
         
-        # Restore the datetime index if it was originally present
-        if datetime_index:
-            processed_df = processed_df.set_index(datetime_column)
         
         print("Signal Generation Complete")
-        return processed_df
-    
+
+        processed_df.rename(columns={'Unnamed: 0': 'Date', 'break_signal': 'Signal'}, inplace=True)
+        # processed_df.set_index('Date', inplace=True)
+        # return processed_df[['Close','break_signal', 'buy_pct', 'sell_pct']]
+        return processed_df[['Date', 'Close', 'Signal']]
