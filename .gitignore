@@ -1,0 +1,7 @@
+# ignore the vscode folder
+.vscode/
+
+# ignore the cashe
+FVG/__pycache__/
+ML/__pycache__/
+
