@@ -25,7 +25,7 @@ def get_bitcoin_data(start_date, timeframe='1d'):
     exchange = ccxt.coinbase()
     
     # Define the symbol and timeframe
-    symbol = 'BTC/USD'
+    symbol = 'ETH/USD'
     
     # Convert the start date to a timestamp in milliseconds
     since = exchange.parse8601(start_date)
@@ -90,6 +90,6 @@ if __name__ == "__main__":
     # Save to CSV
 
     import os
-    path = os.path.join(os.path.dirname(__file__), 'data.csv')
+    path = os.path.join(os.path.dirname(__file__), 'ETH.csv')
     merged_df.to_csv(path)
     print("Bitcoin and risk free rate data saved to data.csv")

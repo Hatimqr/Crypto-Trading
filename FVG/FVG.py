@@ -255,4 +255,4 @@ class FVGStrategy:
 
         processed_df.rename(columns={'Unnamed: 0': 'Date', 'break_signal': 'Signal'}, inplace=True)
         processed_df['Date'] = pd.to_datetime(processed_df['Date'])
-        return processed_df[['Date', 'Close', 'Signal', 'Risk Free Rate']]
+        return processed_df[['Date', 'Close', 'Signal']]
