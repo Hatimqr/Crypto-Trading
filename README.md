@@ -1,24 +1,24 @@
 # Introduction
 
-The cryptocurrency market, particularly Bitcoin, presents unique challenges for forecasting due to its high volatility and difficulty to predict. This project explores an algorithmic trading approach to formulate a trading strategy for bitcoin. I aim to develop a framework that can effectively predict optimal trading actions (buy, sell, or hold) and their respective magnitudes (for buy and sell) based on historical market data.
+The cryptocurrency market, particularly Bitcoin, presents unique challenges for forecasting due to its high volatility and difficulty to predict. This project explores an algorithmic trading approach to formulate a trading strategy for bitcoin. I aim to develop a framework that can effectively predict optimal trading actions (buy, sell, or hold) based on historical market data.
 
 # Research Question
 
-How can we develop a robust daily decision-making framework for Bitcoin trading that effectively determines optimal actions (buy, sell, or hold) and their magnitude to maximize returns while managing risk across different market conditions?
+How can we develop a robust daily decision-making framework for Bitcoin trading that effectively determines optimal actions (buy, sell, or hold) to maximize returns while managing risk across different market conditions?
 
-Starting with an initial budget $B_0$, an investor makes a sequence of daily trading decisions over a period of $T$ days, denoted as $D = \{d_1, d_2, ..., d_T\}$. For each day $t$, the decision $d_t \in \mathbb{R}$ represents the amount of Bitcoin to trade, where:
+Starting with an initial budget $B_0$, an investor makes a sequence of daily trading decisions over a period of $T$ days, denoted as $D = \{d_1, d_2, ..., d_T\}$. For each day $t$, the decision $d_t \in {-1,0,1}$ represents the amount of Bitcoin to trade, where:
 
-- $d_t > 0$ indicates buying $d_t$ units of Bitcoin
-- $d_t < 0$ indicates selling $|d_t|$ units of Bitcoin
-- $d_t = 0$ indicates holding the current position
+- $d_t = 1$ indicates shifting to a long position (buying bitcoin)
+- $d_t =-1$ indicates shifting to a short position (selling bitcoin)
+- $d_t = 0$ indicates holding the current position (position at $d_{t-1}$)
 
 Given the daily Bitcoin prices $P = \{p_1, p_2, ..., p_T\}$, the investor's portfolio value $V_t$ after day $t$ can be expressed as:
 
 $$
-V_t=B_t+Q_t\cdot p_t
+V_t=C_t+Q_t\cdot p_t
 $$
 
-Where $B_t$ is the remaining cash budget and $Q_t$ is the quantity of Bitcoin held after day $t$. These values are updated according to each decision:
+Where $C_t$ is the remaining cash budget and $Q_t$ is the quantity of Bitcoin held after day $t$. These values are updated according to each decision:
 
 $$
 B_t = B_{t-1} - d_t \cdot p_t - c(d_t, p_t)
