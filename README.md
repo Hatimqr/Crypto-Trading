@@ -80,25 +80,6 @@ The strategy identifies FVGs using the following criteria:
 - Candle C's low is above Candle A's high
 - Gap must be larger than average candle body size × multiplier
 
-### Position Sizing
-
-Position sizes are dynamically calculated based on multiple factors:
-
-1.**Base Position**: Starts with 30% allocation
-
-2.**Volatility Adjustment**: Up to 30% additional based on 20-day rolling volatility
-
-3.**Momentum Component**: Up to 20% based on 20-day price momentum
-
-4.**Gap Size Impact**: Up to 20% based on FVG size
-
-5.**Consecutive Signals**: Position size increases with consecutive signals (20% per signal, max 100%)
-
-The final position size is capped at 100% of available capital and is further adjusted by:
-
-- Upside scaler for buy positions
-- Downside scaler for sell positions
-
 ### Parameters
 
 -`lookback_period`: 20 days (for volatility calculation)
@@ -109,11 +90,9 @@ The final position size is capped at 100% of available capital and is further ad
 
 -`test_candles`: 10 (forward-looking period for signal validation)
 
-## Model: Opt Strategy and Random Forest
-
 # Evaluation
 
-The project will evaluate the effectiveness of our trading strategy's decisions using the following performance metrics that directly assess how well our algorithm determines the optimal quantities ($d_i$  values) to buy, sell, or hold:
+The project will evaluate the effectiveness of our trading strategy's decisions using the following performance metrics that directly assess how well our algorithm determines the optimal $d_i$ to buy, sell, or hold:
 
 ## Performance Metrics
 
@@ -174,22 +153,10 @@ Compares the performance metrics (sharpe ratio and maximum drawdown) of our dyna
 - Our strategy generates a different sequence of $d_t$ values that varies exposure over time
 - The resulting Sharpe ratio and Drawdowns will be different and this comparison will be the final evaluation
 
-## **Trade Analysis**
-
-Examine individual trading decisions to evaluate their effectiveness through the following metrics:
-
-- Win rate: Percentage of $d_t$ decisions that contributed positively to portfolio value
-- Average profit/loss per trade: Mean portfolio value change resulting from each non-zero $d_i$
-- Average holding period: Typical duration between buy and sell decisions
-
-This analysis helps identify whether our algorithm makes consistently good quantity decisions or relies on a few outsized winners.
-
-These metrics will be mainly used on the test set to understand what the model is really doing so I might find ways of improving it or making necessary changes.
-
-## Tentative Targets
+## Targets
 
 Prior to model development I am setting the following targets (which are subject to adjustment) for evaluating whether the approach was successful or not:
 
-1. Sharpe ratio at least 30% higher than a buy-and-hold strategy over the test period.
-2. Maintains a maximum drawdown at least 20% lower than a buy-and-hold strategy.
-3. Win rate of at least 55%
+1. Sharpe ratio at least 20% higher than a buy-and-hold strategy over the test period.
+2. Maintains a maximum drawdown at least 30% lower than a buy-and-hold strategy.
+3. Absolute Return at least 20% higher than a buy-and-hold strategy.
